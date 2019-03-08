@@ -269,6 +269,9 @@ class runTest:
 			return False
 
 		UUIDs = bleAdapter.getPropertie(testDevice, "UUIDs")
+		print("waiting for: %s" %(runTest.DUT_UUID));
+		print("received: %s" %(UUIDs));
+
 		if (UUIDs == None):
 			print("Advertisement test: Waiting for UUIDs")
 			sys.stdout.flush()

@@ -163,12 +163,12 @@ int app_main( void )
         if( prvBLEStackInit() == eBTStatusSuccess )
         {
             /* Connect to the wifi before running the tests. */
-            prvWifiConnect();
+            // prvWifiConnect();
 
             /* A simple example to demonstrate key and certificate provisioning in
             * microcontroller flash using PKCS#11 interface. This should be replaced
             * by production ready key provisioning mechanism. */
-            vDevModeKeyProvisioning();
+            // vDevModeKeyProvisioning();
 
             /* Create the task to run unit tests. */
             xTaskCreate( TEST_RUNNER_RunTests_task,

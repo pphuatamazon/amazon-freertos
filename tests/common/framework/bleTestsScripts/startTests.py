@@ -50,27 +50,40 @@ def main():
 	scan_filter.update({ "UUIDs": [runTest.DUT_UUID]})
 	bleAdapter.setDiscoveryFilter(scan_filter)
 
-	#Discovery test
-	bleAdapter.startDiscovery(discoveryEventCb)
-	mainloop.run()
-	isTestSuccessFull = True
-	runTest.submitTestResult(isTestSuccessFull, runTest.advertisement)
-	bleAdapter.stopDiscovery()
+	i_connection_repeat = 1;
+	i_connection_rw_chars_repeat = 2;
 
-	#Simple Connection test
-	testDevice = runTest.getTestDevice()
-	isTestSuccessFull = bleAdapter.connect(testDevice)
-	runTest.submitTestResult(isTestSuccessFull, runTest.simpleConnection)
-	time.sleep(2) #wait for connection parameters update
+	while True:
+		i_connection_repeat = i_connection_repeat - 1;
+		#Discovery test
+		bleAdapter.startDiscovery(discoveryEventCb)
+		print("discovering ...")
+		mainloop.run()
+		isTestSuccessFull = True
+		runTest.submitTestResult(isTestSuccessFull, runTest.advertisement)
+		bleAdapter.stopDiscovery()
 
-	#Discover all primary services
-	isTestSuccessFull = runTest.discoverPrimaryServices()
-	runTest.submitTestResult(isTestSuccessFull, runTest.discoverPrimaryServices)
+		#Simple Connection test
+		testDevice = runTest.getTestDevice()
+		isTestSuccessFull = bleAdapter.connect(testDevice)
+		runTest.submitTestResult(isTestSuccessFull, runTest.simpleConnection)
+		time.sleep(2) #wait for connection parameters update
 
-	bleAdapter.gatt.updateLocalAttributeTable()
+		#Discover all primary services
+		isTestSuccessFull = runTest.discoverPrimaryServices()
+		runTest.submitTestResult(isTestSuccessFull, runTest.discoverPrimaryServices)
 
-	#Check device not present. After discovery of services, advertisement should have stopped.
-	runTest.stopAdvertisement(scan_filter)
+		bleAdapter.gatt.updateLocalAttributeTable()
+
+		#Check device not present. After discovery of services, advertisement should have stopped.
+		runTest.stopAdvertisement(scan_filter)
+
+		if (i_connection_repeat == 0):
+			break;
+		#disconnect, Note it is not a test happening on bluez, the DUT is waiting for a disconnect Cb
+		runTest.disconnect()
+		bleAdapter.removeBondedDevices()
+		time.sleep(2) #wait for bonds to be removed
 
 
 	#Change MTU size

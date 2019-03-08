@@ -168,7 +168,7 @@ typedef struct{
 }
 
 
-#define bletestsDEVICE_NAME             "BT"
+#define bletestsDEVICE_NAME             "BT-ADT"
 #define bletestsMAX_PROPERTY_SIZE       30
 
 #define bletestsMTU_SIZE1 200
@@ -703,6 +703,9 @@ TEST_TEAR_DOWN( Full_BLE )
 
 TEST_GROUP_RUNNER( Full_BLE )
 {
+	int i_connection_repeat = 1;
+	int i_connection_rw_chars_repeat = 2;
+	
 	/* Initializations that need to be done once for all the tests. */
 	prvGroupInit();
 
@@ -719,8 +722,15 @@ TEST_GROUP_RUNNER( Full_BLE )
 	RUN_TEST_CASE( Full_BLE, BLE_Connection_RemoveAllBonds );
 
 	RUN_TEST_CASE( Full_BLE, BLE_Advertising_SetAvertisementData );//@TOTO, incomplete
-	RUN_TEST_CASE( Full_BLE, BLE_Advertising_StartAdvertisement );
-    RUN_TEST_CASE( Full_BLE, BLE_Connection_SimpleConnection );
+
+	while (true) {
+		RUN_TEST_CASE( Full_BLE, BLE_Advertising_StartAdvertisement );
+	    RUN_TEST_CASE( Full_BLE, BLE_Connection_SimpleConnection );
+	    if (--i_connection_repeat == 0)
+	    	break;
+	    RUN_TEST_CASE( Full_BLE, BLE_Connection_Disconnect );
+	    vTaskDelay( pdMS_TO_TICKS( 5000 ) ); //delay x seconds for PI to check & clean up
+	}
 //RUN_TEST_CASE( Full_BLE, BLE_Connection_UpdateConnectionParamReq );
 
 //RUN_TEST_CASE( Full_BLE, BLE_Connection_ChangeMTUsize );
